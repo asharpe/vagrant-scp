@@ -5,7 +5,9 @@ module Vagrant
         attr_accessor :manifest_file
         attr_accessor :manifests_path
         attr_accessor :module_path
+        attr_accessor :pp_path
         attr_accessor :options
+        attr_accessor :facter
 
         def initialize
           super
@@ -13,7 +15,9 @@ module Vagrant
           @manifest_file = UNSET_VALUE
           @manifests_path = UNSET_VALUE
           @module_path = UNSET_VALUE
+          @pp_path = UNSET_VALUE
           @options = []
+          @facter = {}
         end
 
         def finalize!
@@ -21,7 +25,8 @@ module Vagrant
 
           @manifest_file = 'default.pp' if @manifest_file == UNSET_VALUE
           @manifests_path = 'manifests' if @manifests_path == UNSET_VALUE
-          @module_path = nil if @module_path == UNSET_VALUE
+          @module_path = 'modules' if @module_path == UNSET_VALUE
+          @pp_path = '/etc/puppet' if @pp_path == UNSET_VALUE
         end
 
         # Returns the manifests path expanded relative to the root path of the
@@ -30,18 +35,10 @@ module Vagrant
           Pathname.new(manifests_path).expand_path(root_path)
         end
 
-        # Returns the module paths as an array of paths expanded relative to the
-        # root path.
-        def expanded_module_paths(root_path)
-          return [] if !module_path
-
-          # Get all the paths and expand them relative to the root path, returning
-          # the array of expanded paths
-          paths = module_path
-          paths = [paths] if !paths.is_a?(Array)
-          paths.map do |path|
-            Pathname.new(path).expand_path(root_path)
-          end
+        # Returns the module path expanded relative to the root path of the
+        # environment.
+        def expanded_module_path(root_path)
+          Pathname.new(module_path).expand_path(root_path)
         end
 
         def validate(machine)
@@ -49,7 +46,7 @@ module Vagrant
 
           # Calculate the manifests and module paths based on env
           this_expanded_manifests_path = expanded_manifests_path(machine.env.root_path)
-          this_expanded_module_paths = expanded_module_paths(machine.env.root_path)
+          this_expanded_module_path = expanded_module_path(machine.env.root_path)
 
           # Manifests path/file validation
           # TODO: Provide vagrant.provisioners.puppet_scp translations.
@@ -65,11 +62,9 @@ module Vagrant
           end
 
           # Module paths validation
-          this_expanded_module_paths.each do |path|
-            if !path.directory?
-              errors << I18n.t("vagrant.provisioners.puppet.module_path_missing",
-                               :path => path)
-            end
+          if !this_expanded_module_path.directory?
+            errors << I18n.t("vagrant.provisioners.puppet.module_path_missing",
+                             :path => path)
           end
 
           { "puppet_scp provisioner" => errors }
