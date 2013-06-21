@@ -41,6 +41,10 @@ module Vagrant
           Pathname.new(module_path).expand_path(root_path)
         end
 
+        def manifests_guest_path
+          File.join(pp_path, manifests_path)
+        end
+
         def validate(machine)
           errors = []
 
