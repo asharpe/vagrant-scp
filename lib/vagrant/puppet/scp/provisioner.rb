@@ -20,21 +20,21 @@ module Vagrant
           @expanded_manifests_path = @config.expanded_manifests_path(root_path)
           @expanded_module_path = @config.expanded_module_path(root_path)
           @manifest_file = File.join(@config.manifests_guest_path, @config.manifest_file)
-          @module_path = File.join(@config.pp_path, @config.module_path)
+          @module_path = File.join(@config.guest_path, @config.module_path)
         end
 
         def provision
-          create_pp_path
+          create_guest_path
           share_manifests
           share_modules
           verify_binary('puppet')
           run_puppet_apply
         end
 
-        def create_pp_path
+        def create_guest_path
           @machine.communicate.tap do |comm|
-            comm.sudo("mkdir -p #{@config.pp_path}")
-            comm.sudo("chown -R #{@machine.ssh_info[:username]} #{@config.pp_path}")
+            comm.sudo("mkdir -p #{@config.guest_path}")
+            comm.sudo("chown -R #{@machine.ssh_info[:username]} #{@config.guest_path}")
           end
         end
 

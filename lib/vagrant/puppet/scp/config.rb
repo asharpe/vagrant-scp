@@ -5,7 +5,7 @@ module Vagrant
         attr_accessor :manifest_file
         attr_accessor :manifests_path
         attr_accessor :module_path
-        attr_accessor :pp_path
+        attr_accessor :guest_path
         attr_accessor :options
         attr_accessor :facter
 
@@ -15,7 +15,7 @@ module Vagrant
           @manifest_file = UNSET_VALUE
           @manifests_path = UNSET_VALUE
           @module_path = UNSET_VALUE
-          @pp_path = UNSET_VALUE
+          @guest_path = UNSET_VALUE
           @options = []
           @facter = {}
         end
@@ -26,7 +26,7 @@ module Vagrant
           @manifest_file = 'default.pp' if @manifest_file == UNSET_VALUE
           @manifests_path = 'manifests' if @manifests_path == UNSET_VALUE
           @module_path = 'modules' if @module_path == UNSET_VALUE
-          @pp_path = '/etc/puppet' if @pp_path == UNSET_VALUE
+          @guest_path = '/etc/puppet' if @guest_path == UNSET_VALUE
         end
 
         # Returns the manifests path expanded relative to the root path of the
@@ -42,7 +42,7 @@ module Vagrant
         end
 
         def manifests_guest_path
-          File.join(pp_path, manifests_path)
+          File.join(guest_path, manifests_path)
         end
 
         def validate(machine)
