@@ -34,7 +34,7 @@ module Vagrant
         def create_pp_path
           @machine.communicate.tap do |comm|
             comm.sudo("mkdir -p #{@config.pp_path}")
-            comm.sudo("chown -R #{@machine.ssh_info[:username]}")
+            comm.sudo("chown -R #{@machine.ssh_info[:username]} #{@config.pp_path}")
           end
         end
 
