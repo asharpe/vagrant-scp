@@ -38,11 +38,11 @@ module Vagrant
         end
 
         def manifests_guest_path
-          File.join(guest_path, manifests_path)
+          File.join(guest_path, 'manifests')
         end
 
         def modules_guest_path
-          File.join(guest_path, modules_path)
+          File.join(guest_path, 'modules')
         end
 
         def validate(machine)
