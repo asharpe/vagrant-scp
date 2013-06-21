@@ -52,6 +52,7 @@ module Vagrant
           this_expanded_module_paths = expanded_module_paths(machine.env.root_path)
 
           # Manifests path/file validation
+          # TODO: Provide vagrant.provisioners.puppet_scp translations.
           if !this_expanded_manifests_path.directory?
             errors << I18n.t("vagrant.provisioners.puppet.manifests_path_missing",
                              :path => this_expanded_manifests_path)
