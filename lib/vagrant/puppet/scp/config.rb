@@ -4,7 +4,7 @@ module Vagrant
       class Config < Vagrant.plugin('2', :config)
         attr_accessor :manifest_file
         attr_accessor :manifests_path
-        attr_accessor :module_path
+        attr_accessor :modules_path
         attr_accessor :guest_path
         attr_accessor :options
         attr_accessor :facter
@@ -14,7 +14,7 @@ module Vagrant
 
           @manifest_file = UNSET_VALUE
           @manifests_path = UNSET_VALUE
-          @module_path = UNSET_VALUE
+          @modules_path = UNSET_VALUE
           @guest_path = UNSET_VALUE
           @options = []
           @facter = {}
@@ -25,24 +25,24 @@ module Vagrant
 
           @manifest_file = 'default.pp' if @manifest_file == UNSET_VALUE
           @manifests_path = 'manifests' if @manifests_path == UNSET_VALUE
-          @module_path = 'modules' if @module_path == UNSET_VALUE
+          @modules_path = 'modules' if @modules_path == UNSET_VALUE
           @guest_path = '/etc/puppet' if @guest_path == UNSET_VALUE
         end
 
-        # Returns the manifests path expanded relative to the root path of the
-        # environment.
         def expanded_manifests_path(root_path)
           Pathname.new(manifests_path).expand_path(root_path)
         end
 
-        # Returns the module path expanded relative to the root path of the
-        # environment.
-        def expanded_module_path(root_path)
-          Pathname.new(module_path).expand_path(root_path)
+        def expanded_modules_path(root_path)
+          Pathname.new(modules_path).expand_path(root_path)
         end
 
         def manifests_guest_path
           File.join(guest_path, manifests_path)
+        end
+
+        def modules_guest_path
+          File.join(guest_path, modules_path)
         end
 
         def validate(machine)

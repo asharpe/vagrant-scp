@@ -18,9 +18,8 @@ module Vagrant
           # Calculate the paths we're going to use based on the environment
           root_path = @machine.env.root_path
           @expanded_manifests_path = @config.expanded_manifests_path(root_path)
-          @expanded_module_path = @config.expanded_module_path(root_path)
+          @expanded_modules_path = @config.expanded_module_path(root_path)
           @manifest_file = File.join(@config.manifests_guest_path, @config.manifest_file)
-          @module_path = File.join(@config.guest_path, @config.module_path)
         end
 
         def provision
@@ -43,7 +42,7 @@ module Vagrant
         end
 
         def share_modules
-          @machine.communicate.upload(@expanded_module_path, @config.module_guest_path)
+          @machine.communicate.upload(@expanded_modules_path, @config.modules_guest_path)
         end
 
         def verify_binary(binary)
@@ -56,7 +55,7 @@ module Vagrant
 
         def run_puppet_apply
           options = [config.options].flatten
-          options << "--modulepath '#{@module_path}'" if !@module_path.empty?
+          options << "--modulepath '#{@config.modules_guest_path}'" if !@module_path.empty?
           options << @manifest_file
           options = options.join(" ")
 
