@@ -1,4 +1,4 @@
-require 'vagrant/puppet/scp/version'
+require_relative 'scp/version'
 require 'vagrant'
 
 module Vagrant
@@ -12,12 +12,12 @@ module Vagrant
         DESC
 
         config(:puppet_scp, :provisioner) do
-          require 'vagrant/puppet/scp/config'
+          require_relative 'scp/config'
           Config
         end
 
         provisioner(:puppet_scp) do
-          require 'vagrant/puppet/scp/provisioner'
+          require_relative 'scp/provisioner'
           Provisioner
         end
       end

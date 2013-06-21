@@ -27,8 +27,6 @@ module Vagrant
           create_pp_path
           share_manifests
           share_modules
-
-          # Verify Puppet is installed and run it
           verify_binary('puppet')
           run_puppet_apply
         end
