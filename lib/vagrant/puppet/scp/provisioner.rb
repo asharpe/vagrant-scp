@@ -38,11 +38,11 @@ module Vagrant
         end
 
         def share_manifests
-          @machine.communicate.upload(@expanded_manifests_path, @config.manifests_guest_path)
+          recursive_scp(@expanded_manifests_path, @config.manifests_guest_path)
         end
 
         def share_modules
-          @machine.communicate.upload(@expanded_modules_path, @config.modules_guest_path)
+          recursive_scp(@expanded_modules_path, @config.modules_guest_path)
         end
 
         def verify_binary(binary)
@@ -78,6 +78,23 @@ module Vagrant
           @machine.communicate.sudo(command) do |type, data|
             data.chomp!
             @machine.env.ui.info(data, :prefix => false) if !data.empty?
+          end
+        end
+
+        def recursive_scp(from, to)
+          @machine.communicate.tap do |comm|
+            comm.sudo("rm -rf #{to}")
+            comm.sudo("mkdir -p #{to}")
+            comm.sudo("chown #{@machine.ssh_info[:username]} #{to}")
+          end
+          Dir.glob("#{from}/**/*") do |path|
+            to_path = path.gsub(from, '') # Remove the local cruft
+
+            if File.directory?(path)
+              @machine.communicate.execute("mkdir -p #{to}#{to_path}")
+            else
+              @machine.communicate.upload(path, "#{to}#{to_path}")
+            end
           end
         end
       end
