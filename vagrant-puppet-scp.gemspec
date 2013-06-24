@@ -8,9 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = Vagrant::Puppet::Scp::VERSION
   spec.authors       = ["W. Andrew Loe III"]
   spec.email         = ["andrew@andrewloe.com"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
-  spec.homepage      = ""
+  spec.description   = %q{A puppet apply provisioner for Vagrant that uses SCP instead of shared directories.}
+  spec.summary       = %q{A puppet apply provisioner for Vagrant that uses SCP instead of shared directories.}
+  spec.homepage      = "https://github.com/loe/vagrant-puppet-scp"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
