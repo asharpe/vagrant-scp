@@ -18,7 +18,7 @@ module Vagrant
           # Calculate the paths we're going to use based on the environment
           root_path = @machine.env.root_path
           @expanded_manifests_path = @config.expanded_manifests_path(root_path)
-          @expanded_modules_path = @config.expanded_module_path(root_path)
+          @expanded_modules_path = @config.expanded_modules_path(root_path)
           @manifest_file = File.join(@config.manifests_guest_path, @config.manifest_file)
         end
 
@@ -48,14 +48,14 @@ module Vagrant
         def verify_binary(binary)
           @machine.communicate.sudo(
             "which #{binary}",
-            :error_class => PuppetError,
+            :error_class => PuppetScpError,
             :error_key => :not_detected,
             :binary => binary)
         end
 
         def run_puppet_apply
           options = [config.options].flatten
-          options << "--modulepath '#{@config.modules_guest_path}'" if !@module_path.empty?
+          options << "--modulepath '#{@config.modules_guest_path}'" if !@config.modules_guest_path.empty?
           options << @manifest_file
           options = options.join(" ")
 
@@ -87,8 +87,9 @@ module Vagrant
             comm.sudo("mkdir -p #{to}")
             comm.sudo("chown #{@machine.ssh_info[:username]} #{to}")
           end
+
           Dir.glob("#{from}/**/*") do |path|
-            to_path = path.gsub(from, '') # Remove the local cruft
+            to_path = path.gsub(from.to_s, '') # Remove the local cruft
 
             if File.directory?(path)
               @machine.communicate.execute("mkdir -p #{to}#{to_path}")
