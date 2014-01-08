@@ -22,10 +22,6 @@ module VagrantPlugins
 
         @source_path = Pathname.new(@source_path) if @source_path != UNSET_VALUE
         @destination_path = Pathname.new(@destination_path) if @destination_path != UNSET_VALUE
-        @destination_owner = @machine.ssh_info[:username] if @destination_path == UNSET_VALUE
-#        @manifests_path = 'manifests' if @manifests_path == UNSET_VALUE
-#        @modules_path = 'modules' if @modules_path == UNSET_VALUE
-#        @guest_path = '/etc/puppet' if @guest_path == UNSET_VALUE
       end
 
       def validate(machine)

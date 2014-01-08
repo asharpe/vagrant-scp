@@ -13,63 +13,48 @@ module VagrantPlugins
         @logger = Log4r::Logger.new('vagrant::scp')
       end
 
-      def configure(root_config)
-        # Calculate the paths we're going to use based on the environment
-        root_path = @machine.env.root_path
-
-        @source_path = @config.source_path
-        @destination_path = @config.destination_path
-        @destination_user = @config.destination_user
-      end
-
       def provision
-        create_guest_path
+        # TODO this is messy
+        @destination_owner = @config.destination_owner
+        @destination_owner = @machine.ssh_info[:username] if @config.destination_owner == ::Vagrant::Plugin::V2::Config::UNSET_VALUE
+
         copy_files
         change_ownership
-        verify_binary('puppet')
-        run_puppet_apply
-      end
-
-      def create_guest_path
-        @machine.communicate.tap do |comm|
-          comm.sudo("mkdir -p #{@destination_path}")
-          comm.sudo("chown -R #{@machine.ssh_info[:username]} #{@destination_path}")
-        end
       end
 
       def copy_files
-        recursive_scp(@source_path, @destination_path)
+        recursive_scp(@config.source_path, @config.destination_path)
       end
-
 
       def change_ownership
         @machine.communicate.tap do |comm|
-          comm.sudo("chown -R #{@destination_user} #{@destination_path}")
+          comm.sudo("chown -R #{@destination_owner} #{@config.destination_path}")
         end
       end
 
-#      def verify_binary(binary)
-#        @machine.communicate.sudo(
-#          "which #{binary}",
-#          :error_class => PuppetScpError,
-#          :error_key => :not_detected,
-#          :binary => binary)
-#      end
-
       def recursive_scp(from, to)
-        @machine.communicate.tap do |comm|
-          comm.sudo("rm -rf #{to}")
-          comm.sudo("mkdir -p #{to}")
-          comm.sudo("chown #{@machine.ssh_info[:username]} #{to}")
-        end
+        if from.file?
+          @machine.ui.info "uploading #{from} to #{to}"
+          @machine.communicate.upload(from, to)
 
-        Dir.glob("#{from}/**/*") do |path|
-          to_path = path.gsub(from.to_s, '') # Remove the local cruft
+        elsif from.directory?
+          # need to create the remote root
+          @machine.communicate.tap do |comm|
+            comm.sudo("rm -rf #{to}")
+            comm.sudo("mkdir -p #{to}")
+            comm.sudo("chown #{@machine.ssh_info[:username]} #{to}")
+          end
 
-          if File.directory?(path)
-            @machine.communicate.execute("mkdir -p #{to}#{to_path}")
-          else
-            @machine.communicate.upload(path, "#{to}#{to_path}")
+          Dir.glob("#{from}/**/*") do |path|
+            to_path = path.gsub(from.to_s, '') # Remove the local cruft
+
+            if File.directory?(path)
+              @machine.ui.info "making #{to}#{to_path}"
+              @machine.communicate.execute("mkdir -p #{to}#{to_path}")
+            else
+              @machine.ui.info "uploading #{path} to #{to}#{to_path}"
+              @machine.communicate.upload(path, "#{to}#{to_path}")
+            end
           end
         end
       end
