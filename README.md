@@ -1,4 +1,4 @@
-# Vagrant::Puppet::Scp
+# Vagrant::Scp
 
 TODO: Write a gem description
 
