@@ -1,0 +1,6 @@
+en:
+   vagrant_scp:
+      config:
+         source_not_set: "Source path not set"
+         source_not_exist: "Source path (%{path}) doesn't exist"
+         source_not_file_or_dir: "Source path (%{path}) is not a file or directory"
